@@ -1,0 +1,77 @@
+// allprojects {
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
+// }
+
+// rootProject.buildDir = "../build"
+// subprojects {
+//     project.buildDir = "${rootProject.buildDir}/${project.name}"
+// }
+// subprojects {
+//     project.evaluationDependsOn(":app")
+// }
+
+// subprojects {
+//     configurations.all {
+//         resolutionStrategy.eachDependency { details ->
+//             if (details.requested.group == 'org.jetbrains.kotlin') {
+//                 details.useVersion '1.8.20' // Force a single Kotlin version
+//             }
+//         }
+//     }
+// }
+
+// tasks.register("clean", Delete) {
+//     delete rootProject.buildDir
+// }
+
+buildscript {
+    ext.kotlin_version = '1.8.20' // Define Kotlin version globally
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.1.1" // Upgrade Gradle plugin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+// 🔥 Force all Kotlin dependencies to use the same version
+subprojects {
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'org.jetbrains.kotlin') {
+                details.useVersion '1.8.20' // Force all dependencies to use Kotlin 1.8.20
+                details.because "Avoid duplicate Kotlin dependencies issue"
+            }
+        }
+    }
+}
+
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
+
